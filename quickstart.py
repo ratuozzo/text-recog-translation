@@ -24,7 +24,6 @@ result = speech_recognizer.recognize_once()
 
 # Checks result.
 if result.reason == speechsdk.ResultReason.RecognizedSpeech:
-    print("Recognized: {}".format(result.text))
     headers = {
     'Ocp-Apim-Subscription-Key': text_key,
     'Ocp-Apim-Subscription-Region': service_region,
@@ -39,9 +38,11 @@ if result.reason == speechsdk.ResultReason.RecognizedSpeech:
     request = requests.post(api_url, headers=headers, json=body)
     response = request.json()
     #print(json.dumps(response, sort_keys=True, indent=4, ensure_ascii=False, separators=(',', ': ')))
+    print("Recognized: {}".format(result.text))
+    print(f"Language: {response[0]['language']}")
     
     path = '/translate?api-version=3.0'
-    params = f'&from={response[0]["language"]}&to=en'
+    params = f'&from={response[0]["language"]}&to=es&to=en&to=de'
     constructed_url = translate_url + params
 
     headers = {
@@ -57,7 +58,9 @@ if result.reason == speechsdk.ResultReason.RecognizedSpeech:
     }]
     request = requests.post(constructed_url, headers=headers, json=body)
     response = request.json()
-    print(response[0]["translations"][0]["text"])
+    #print(response[0]["translations"][0]["text"])
+    for (i, translation) in enumerate(response[0]["translations"]):
+        print(f"Translation {translation['to']}: {translation['text']}")
 
     #print(json.dumps(response, sort_keys=True, indent=4, ensure_ascii=False, separators=(',', ': ')))
 elif result.reason == speechsdk.ResultReason.NoMatch:
